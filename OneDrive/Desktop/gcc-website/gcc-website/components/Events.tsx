@@ -17,8 +17,8 @@ export default function Events() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="mb-5 text-xs font-medium uppercase tracking-[0.3em] text-[#68d32f]">
             Events
@@ -41,14 +41,26 @@ export default function Events() {
           {events.map((event, index) => (
             <motion.article
               key={event.id ?? index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.6,
-                delay: index * 0.1,
+              data-cursor="VIEW"
+              variants={{
+                hidden: { opacity: 0, y: 40 },
+                visible: { 
+                  opacity: 1, 
+                  y: 0, 
+                  transition: { duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] } 
+                },
+                hover: {
+                  y: -6,
+                  borderColor: "rgba(104, 211, 47, 0.4)",
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+                }
               }}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-300 hover:border-[#68d32f]/40 hover:bg-white/[0.05]"
+              initial="hidden"
+              whileInView="visible"
+              whileHover="hover"
+              viewport={{ once: true, margin: "-50px" }}
+              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 cursor-pointer"
             >
               {/* Number */}
               <div className="flex items-center justify-between">
@@ -56,7 +68,14 @@ export default function Events() {
                   {String(index + 1).padStart(2, "0")}
                 </span>
 
-                <span className="h-2 w-2 rounded-full bg-[#68d32f] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <motion.span 
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.5 },
+                    visible: { opacity: 0, scale: 0.5 },
+                    hover: { opacity: 1, scale: 1, transition: { duration: 0.3 } }
+                  }}
+                  className="h-2 w-2 rounded-full bg-[#68d32f]" 
+                />
               </div>
 
               {/* Content */}
@@ -69,18 +88,28 @@ export default function Events() {
                   {event.title}
                 </h3>
 
-                <p className="mt-4 text-sm leading-6 text-white/50">
+                <motion.p 
+                  variants={{
+                    hover: { color: "rgba(255, 255, 255, 0.7)" }
+                  }}
+                  className="mt-4 text-sm leading-6 text-white/50"
+                >
                   {event.description}
-                </p>
+                </motion.p>
               </div>
 
               {/* Arrow */}
               <div className="mt-10 flex items-center justify-between border-t border-white/10 pt-5">
                 <span className="text-sm text-white/50">View event</span>
 
-                <span className="text-xl transition-transform duration-300 group-hover:translate-x-1">
+                <motion.span 
+                  variants={{
+                    hover: { x: 6, color: "#68d32f", transition: { duration: 0.3 } }
+                  }}
+                  className="text-xl"
+                >
                   →
-                </span>
+                </motion.span>
               </div>
             </motion.article>
           ))}

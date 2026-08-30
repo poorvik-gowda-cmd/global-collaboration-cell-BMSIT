@@ -1,15 +1,30 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import FlightPaths from "./FlightPaths";
 
 export default function Hero() {
+  const containerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const blur = useTransform(scrollYProgress, [0, 1], ["blur(0px)", "blur(10px)"]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.8], [0, 1]);
+
   return (
     <section
+      ref={containerRef}
       id="home"
       className="relative flex min-h-screen items-center overflow-hidden bg-[#050608]"
     >
       {/* Earth Video */}
-      <video
+      <motion.video
+        style={{ opacity }}
         className="absolute inset-0 h-full w-full object-cover object-center"
         autoPlay
         muted
@@ -18,22 +33,34 @@ export default function Hero() {
         preload="auto"
       >
         <source src="/videos/earth.mp4" type="video/mp4" />
-      </video>
+      </motion.video>
 
       {/* Main cinematic overlay */}
       <div className="absolute inset-0 bg-black/35" />
 
       {/* Dark left gradient for typography */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#050608] via-[#050608]/75 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#050608] via-[#050608]/75 to-transparent z-10" />
 
       {/* Bottom gradient */}
-      <div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-[#050608] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-[#050608] to-transparent z-10" />
 
       {/* Subtle vignette */}
-      <div className="absolute inset-0 shadow-[inset_0_0_180px_rgba(0,0,0,0.85)]" />
+      <div className="absolute inset-0 shadow-[inset_0_0_180px_rgba(0,0,0,0.85)] z-10 pointer-events-none" />
+
+      {/* Flight Paths Layer */}
+      <FlightPaths scrollYProgress={scrollYProgress} />
+
+      {/* Transition overlay for seamless scroll to next section */}
+      <motion.div 
+        style={{ opacity: overlayOpacity }}
+        className="absolute inset-0 bg-[#050608] pointer-events-none z-10" 
+      />
 
       {/* Hero Content */}
-      <div className="relative z-10 mx-auto w-full max-w-[1500px] px-6 pt-28 md:px-10 lg:pt-20">
+      <motion.div 
+        style={{ opacity, y, filter: blur }}
+        className="relative z-20 mx-auto w-full max-w-[1500px] px-6 pt-28 md:px-10 lg:pt-20"
+      >
         <div className="max-w-[700px]">
 
           {/* Eyebrow */}
@@ -118,7 +145,7 @@ export default function Hero() {
             </div>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
 
      
 
@@ -126,7 +153,7 @@ export default function Hero() {
       <motion.div
         animate={{ y: [0, 7, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-7 left-1/2 z-20 -translate-x-1/2 text-center"
+        className="absolute bottom-7 left-1/2 z-30 -translate-x-1/2 text-center"
       >
         <div className="mx-auto mb-3 flex h-11 w-7 items-center justify-center rounded-full border border-white/30">
           <div className="h-2.5 w-1 rounded-full bg-white/70" />
