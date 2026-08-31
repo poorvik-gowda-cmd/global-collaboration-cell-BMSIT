@@ -1,0 +1,19 @@
+# =============================================================
+# Local development secrets for Cloudflare Workers (wrangler dev)
+# Copy to .dev.vars (gitignored) and fill in your values.
+# These map to `env.*` bindings in your Worker at runtime.
+# =============================================================
+
+# App
+ENVIRONMENT=development
+LOG_LEVEL=debug
+
+# CORS — the local web app origin
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+
+# Future: Google OAuth callback (not yet implemented)
+# GOOGLE_CLIENT_ID=your_google_client_id_here
+# GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# Future: JWT signing secret (not yet implemented)
+# JWT_SECRET=your_long_random_jwt_secret_here

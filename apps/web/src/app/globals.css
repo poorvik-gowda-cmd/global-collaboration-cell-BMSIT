@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/*
+ * Global CSS for GCC Portal.
+ * Tailwind CSS v4 uses @import instead of @tailwind directives.
+ *
+ * Add custom design tokens, CSS variables, and base styles here.
+ */
+
+:root {
+  /* Brand colours — to be finalised with design */
+  --color-brand-primary: #1d4ed8;
+  --color-brand-secondary: #7c3aed;
+  --color-brand-accent: #f59e0b;
+
+  /* Typography scale */
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", monospace;
+}
+
+@theme {
+  --color-brand-primary: var(--color-brand-primary);
+  --color-brand-secondary: var(--color-brand-secondary);
+  --color-brand-accent: var(--color-brand-accent);
+}
+
+/* Smooth scrolling for accessibility */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

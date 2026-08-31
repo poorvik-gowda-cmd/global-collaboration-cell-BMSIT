@@ -1,0 +1,25 @@
+/**
+ * @gcc-portal/google-adapters
+ *
+ * Google Workspace API adapter interfaces and error types.
+ * Concrete implementations (Sheets, Drive, Forms) are NOT included yet.
+ *
+ * @see docs/DATA_OWNERSHIP.md
+ * @see docs/ARCHITECTURE.md — Google Workspace integration section
+ */
+
+export type {
+  GoogleServiceAccountConfig,
+  SheetRow,
+  GoogleSheetsAdapter,
+  DriveFileMetadata,
+  GoogleDriveAdapter,
+  FormResponse,
+  GoogleFormsAdapter,
+} from "./interfaces.js";
+
+export {
+  GoogleAdapterError,
+  GoogleAuthError,
+  GoogleApiRateLimitError,
+} from "./errors.js";

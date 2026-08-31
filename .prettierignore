@@ -1,0 +1,8 @@
+node_modules
+dist
+.next
+.wrangler
+coverage
+.turbo
+pnpm-lock.yaml
+*.d.ts

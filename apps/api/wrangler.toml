@@ -1,0 +1,62 @@
+# =============================================================
+# Wrangler configuration for GCC Portal API
+# Cloudflare Worker — TypeScript
+#
+# DO NOT put real secrets here.
+# Use `wrangler secret put <KEY>` for sensitive values,
+# or reference them via environment variable bindings.
+# =============================================================
+
+name = "gcc-portal-api"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# -----------------------------------------------------------------
+# Development environment (wrangler dev)
+# -----------------------------------------------------------------
+[env.development]
+name = "gcc-portal-api-dev"
+
+  # D1 Database binding (development)
+  # Create with: wrangler d1 create gcc-portal-db-dev
+  # Then replace <DEV_DATABASE_ID> with the generated ID.
+  [[env.development.d1_databases]]
+  binding = "DB"
+  database_name = "gcc-portal-db-dev"
+  database_id = "<DEV_DATABASE_ID>"       # Replace before first `wrangler dev`
+
+  # KV Namespace binding (development) — for caching / session tokens later
+  # Create with: wrangler kv namespace create gcc-portal-cache-dev
+  # [[env.development.kv_namespaces]]
+  # binding = "CACHE"
+  # id = "<DEV_KV_NAMESPACE_ID>"
+
+# -----------------------------------------------------------------
+# Staging environment
+# -----------------------------------------------------------------
+[env.staging]
+name = "gcc-portal-api-staging"
+
+  [[env.staging.d1_databases]]
+  binding = "DB"
+  database_name = "gcc-portal-db-staging"
+  database_id = "<STAGING_DATABASE_ID>"   # Replace before staging deploy
+
+# -----------------------------------------------------------------
+# Production environment
+# -----------------------------------------------------------------
+[env.production]
+name = "gcc-portal-api"
+
+  [[env.production.d1_databases]]
+  binding = "DB"
+  database_name = "gcc-portal-db"
+  database_id = "<PRODUCTION_DATABASE_ID>" # Replace before production deploy
+
+# -----------------------------------------------------------------
+# Observability
+# -----------------------------------------------------------------
+[observability]
+enabled = true
+head_sampling_rate = 1
