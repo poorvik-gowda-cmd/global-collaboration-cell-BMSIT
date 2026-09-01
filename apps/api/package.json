@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@gcc-portal/contracts": "workspace:*",
+    "@gcc-portal/auth": "workspace:*",
+    "@gcc-portal/database": "workspace:*",
     "hono": "^4.7.11"
   },
   "devDependencies": {

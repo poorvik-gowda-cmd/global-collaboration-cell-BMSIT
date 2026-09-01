@@ -19,6 +19,8 @@ export interface UserIdentity {
   displayName: string;
   /** URL to the user's Google profile picture. */
   avatarUrl?: string | undefined;
+  /** Role in the system (member, coordinator, admin). */
+  role: UserRole;
 }
 
 /**

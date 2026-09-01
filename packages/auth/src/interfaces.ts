@@ -37,6 +37,8 @@ export interface OAuthProviderConfig {
   providerId: string;
   /** OAuth client ID. */
   clientId: string;
+  /** OAuth client secret. */
+  clientSecret: string;
   /** OAuth authorisation endpoint URL. */
   authorizationUrl: string;
   /** Token exchange endpoint URL. */
@@ -48,22 +50,30 @@ export interface OAuthProviderConfig {
 }
 
 /**
+ * Result of getAuthorizationUrl, containing PKCE verifiers if needed.
+ */
+export interface AuthorizationRequest {
+  url: string;
+  state: string;
+  codeVerifier: string;
+}
+
+/**
  * The primary authentication service interface.
  * Implementations are responsible for provider-specific OAuth flows.
  */
 export interface AuthService {
   /**
    * Generate an authorisation URL to redirect the user to the OAuth provider.
-   * @param state - CSRF protection state value.
    */
-  getAuthorizationUrl(state: string): string;
+  getAuthorizationUrl(): AuthorizationRequest;
 
   /**
    * Exchange an authorisation code for an authenticated session.
    * @param code - The authorisation code returned by the provider.
-   * @param state - The state value to validate against CSRF.
+   * @param codeVerifier - The PKCE code verifier generated earlier.
    */
-  handleCallback(code: string, state: string): Promise<AuthSession>;
+  handleCallback(code: string, codeVerifier: string): Promise<AuthSession>;
 
   /**
    * Validate an existing access token and return the associated user.

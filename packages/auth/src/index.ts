@@ -19,3 +19,6 @@ export {
   InvalidTokenError,
   OAuthCallbackError,
 } from "./errors.js";
+
+export { GoogleAuthService } from "./google.js";
+export type { GoogleAuthDependencies } from "./google.js";

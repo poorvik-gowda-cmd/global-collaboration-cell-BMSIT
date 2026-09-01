@@ -19,7 +19,8 @@ export interface Env {
 
   // ---- Future bindings (uncomment when needed) ----
   // CACHE: KVNamespace;
-  // GOOGLE_CLIENT_ID: string;
-  // GOOGLE_CLIENT_SECRET: string;
-  // JWT_SECRET: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_REDIRECT_URI: string;
+  JWT_SECRET: string;
 }
