@@ -58,10 +58,13 @@ GCC-organised events.
 | `id` | TEXT (UUID) | Primary key |
 | `title` | TEXT | — |
 | `description` | TEXT | Nullable |
+| `category` | TEXT | NOT NULL |
+| `status` | TEXT | NOT NULL (`draft` or `published`) |
 | `date` | TEXT | ISO 8601 |
 | `location` | TEXT | Nullable |
 | `created_by` | TEXT | FK → `users.id` |
-| `created_at` | TEXT | — |
+| `created_at` | TEXT | ISO 8601 timestamp |
+| `updated_at` | TEXT | ISO 8601 timestamp |
 
 ### `registrations` *(planned)*
 Event registration records.
@@ -97,5 +100,5 @@ Internal task tracking for coordinators.
 1. All primary keys are UUIDs (TEXT) — avoids sequential ID leakage.
 2. Timestamps are stored as ISO 8601 TEXT — SQLite has no native DATE type.
 3. Foreign keys are declared but D1 requires `PRAGMA foreign_keys = ON` per connection.
-4. No soft-delete pattern yet — to be decided during feature design.
+4. Hard deletion is currently used (e.g., events). Cascade deletion should be configured for related records (e.g., registrations) when those tables are created.
 5. Keep the schema minimal — add columns only when a feature requires them.

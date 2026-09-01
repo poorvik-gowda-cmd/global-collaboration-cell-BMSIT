@@ -4,6 +4,7 @@ import type { Env } from "./types/bindings.js";
 import { health } from "./routes/health.js";
 import { auth } from "./routes/auth.js";
 import { createCorsMiddleware } from "./middleware/cors.js";
+import { events } from "./routes/events.js";
 
 /**
  * GCC Portal API — Cloudflare Worker
@@ -21,6 +22,7 @@ app.use("*", createCorsMiddleware());
 // ---- Routes ----
 app.route("/health", health);
 app.route("/auth", auth);
+app.route("/events", events);
 
 // ---- Root ----
 app.get("/", (c) => {
