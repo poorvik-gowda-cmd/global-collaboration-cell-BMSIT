@@ -1,32 +1,69 @@
 @import "tailwindcss";
 
-/*
- * Global CSS for GCC Portal.
- * Tailwind CSS v4 uses @import instead of @tailwind directives.
- *
- * Add custom design tokens, CSS variables, and base styles here.
- */
-
 :root {
-  /* Brand colours — to be finalised with design */
-  --color-brand-primary: #1d4ed8;
-  --color-brand-secondary: #7c3aed;
-  --color-brand-accent: #f59e0b;
-
-  /* Typography scale */
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", monospace;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
-@theme {
-  --color-brand-primary: var(--color-brand-primary);
-  --color-brand-secondary: var(--color-brand-secondary);
-  --color-brand-accent: var(--color-brand-accent);
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
-/* Smooth scrolling for accessibility */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.custom-cursor-active,
+.custom-cursor-active * {
+  cursor: none !important;
+}
+
+/* Member profile cinematic atmosphere */
+.profile-atmosphere {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 40%, rgba(94, 234, 25, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 70%, rgba(94, 234, 25, 0.04) 0%, transparent 60%);
+}
+
+.profile-geometry {
+  background-image:
+    linear-gradient(rgba(94, 234, 25, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 234, 25, 0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 80%);
+  opacity: 0.5;
+}
+
+.profile-grain {
+  position: absolute;
+}
+
+.profile-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-atmosphere,
+  .profile-geometry {
+    transition: none;
   }
 }
