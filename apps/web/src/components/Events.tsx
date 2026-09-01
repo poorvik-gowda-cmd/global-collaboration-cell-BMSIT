@@ -1,9 +1,44 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { events } from "@/data/events";
+import type { Event } from "@gcc-portal/contracts";
 
 export default function Events() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
+        const res = await fetch(`${apiUrl}/events`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const payload = await res.json() as { success: boolean; data: Event[] };
+          setEvents(payload.data);
+        } else {
+          setError(new Error("Failed to load events"));
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error("An error occurred"));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    void fetchEvents();
+  }, []);
+
+  const formatDate = (isoString: string) => {
+    return new Date(isoString).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+  };
+
   return (
     <section
       id="events"
@@ -37,8 +72,15 @@ export default function Events() {
         </motion.div>
 
         {/* Events */}
-        <div className="mt-20 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event, index) => (
+        {isLoading ? (
+          <div className="mt-20 flex justify-center text-white/50">Loading events...</div>
+        ) : error ? (
+          <div className="mt-20 flex justify-center text-red-500/50">Failed to load events.</div>
+        ) : events.length === 0 ? (
+          <div className="mt-20 flex justify-center text-white/50">No events currently scheduled.</div>
+        ) : (
+          <div className="mt-20 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {events.map((event, index) => (
             <motion.article
               key={event.id}
               data-cursor="VIEW"
@@ -81,7 +123,7 @@ export default function Events() {
               {/* Content */}
               <div className="mt-16">
                 <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[#68d32f]">
-                  {event.date}
+                  {formatDate(event.date)}
                 </p>
 
                 <h3 className="text-2xl font-medium tracking-tight md:text-3xl">
@@ -94,7 +136,7 @@ export default function Events() {
                   }}
                   className="mt-4 text-sm leading-6 text-white/50"
                 >
-                  {event.description}
+                  {event.description ?? "No description available."}
                 </motion.p>
               </div>
 
@@ -113,7 +155,8 @@ export default function Events() {
               </div>
             </motion.article>
           ))}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
