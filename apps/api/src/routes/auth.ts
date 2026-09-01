@@ -77,7 +77,8 @@ auth.get("/callback", async (c) => {
     deleteCookie(c, "oauth_state");
     deleteCookie(c, "oauth_code_verifier");
 
-    return c.redirect("/");
+    const frontendUrl = c.env.CORS_ALLOWED_ORIGINS?.split(",")[0]?.trim() ?? "http://localhost:3000";
+    return c.redirect(frontendUrl);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     return c.json({

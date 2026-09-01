@@ -17,6 +17,7 @@ export function createCorsMiddleware(): MiddlewareHandler<{ Bindings: Env }> {
       origin: (origin) => (allowedOrigins.includes(origin) ? origin : null),
       allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
       maxAge: 86400,
     })(c, next);
   };

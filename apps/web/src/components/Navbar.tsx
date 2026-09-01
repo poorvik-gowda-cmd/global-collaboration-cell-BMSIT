@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   "About",
@@ -15,6 +16,8 @@ const navItems = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, isLoading, logout } = useAuth();
+  const loginUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787"}/auth/login`;
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 py-4 md:px-8">
@@ -67,6 +70,48 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-3">
+          {isLoading ? (
+            <div className="h-10 w-24 animate-pulse rounded-full bg-white/10" />
+          ) : user ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.05] px-3 py-1.5 backdrop-blur-md">
+                {user.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatarUrl} alt={user.displayName} className="h-6 w-6 rounded-full" />
+                ) : (
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#68d32f] text-xs font-bold text-black">
+                    {user.displayName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-sm font-medium text-white">{user.displayName}</span>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  void logout();
+                }}
+                className="
+                  rounded-full border border-white/20 bg-white/5 px-4 py-2
+                  text-sm font-medium text-white transition-all
+                  hover:bg-white/10
+                "
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <a
+              href={loginUrl}
+              className="
+                rounded-full border border-[#68d32f]/50 px-4 py-2
+                text-sm font-medium text-[#68d32f] transition-all
+                hover:bg-[#68d32f]/10
+              "
+            >
+              Login
+            </a>
+          )}
+
           {/* Join GCC */}
           <a
             href="/join"
@@ -88,8 +133,6 @@ export default function Navbar() {
             Join GCC
             <span className="ml-3 text-lg">→</span>
           </a>
-
-         
         </div>
       </nav>
 
