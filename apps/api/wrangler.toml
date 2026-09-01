@@ -24,7 +24,7 @@ name = "gcc-portal-api-dev"
   [[env.development.d1_databases]]
   binding = "DB"
   database_name = "gcc-portal-db-dev"
-  database_id = "<DEV_DATABASE_ID>"       # Replace before first `wrangler dev`
+  database_id = "8a2af7bc-dddc-4807-96e5-8eccfc83ea1c"       # Replace before first `wrangler dev`
 
   # KV Namespace binding (development) — for caching / session tokens later
   # Create with: wrangler kv namespace create gcc-portal-cache-dev
