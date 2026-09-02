@@ -184,3 +184,27 @@ export interface GoogleSheetsTasksAdapter {
   appendTask(task: GoogleSheetTaskRecord): Promise<void>;
   getTaskById(taskId: string): Promise<GoogleSheetTaskRecord | null>;
 }
+
+// -----------------------------------------------------------------------
+// Opportunities adapter
+// -----------------------------------------------------------------------
+
+export interface GoogleSheetOpportunityRecord {
+  opportunity_id: string;
+  title: string;
+  organization: string;
+  category: string;
+  description: string;
+  deadline: string;
+  application_url: string;
+  country: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoogleSheetsOpportunitiesAdapter {
+  getOpportunities(): Promise<GoogleSheetOpportunityRecord[]>;
+  appendOpportunity(opportunity: GoogleSheetOpportunityRecord): Promise<void>;
+  getOpportunityById(opportunityId: string): Promise<GoogleSheetOpportunityRecord | null>;
+}
