@@ -105,3 +105,31 @@ export interface GoogleFormsAdapter {
    */
   getResponses(formId: string): Promise<FormResponse[]>;
 }
+
+// -----------------------------------------------------------------------
+// Events adapter
+// -----------------------------------------------------------------------
+
+export interface GoogleSheetEventRecord {
+  event_id: string;
+  title: string;
+  short_description: string;
+  full_description: string;
+  category: string;
+  venue: string;
+  start_datetime: string;
+  end_datetime: string;
+  registration_status: string;
+  event_status: string;
+  registration_capacity: string;
+  registration_count: string;
+  banner_url: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoogleSheetsEventsAdapter {
+  getEvents(): Promise<GoogleSheetEventRecord[]>;
+  appendEvent(event: GoogleSheetEventRecord): Promise<void>;
+}

@@ -12,6 +12,8 @@ export type {
   GoogleServiceAccountConfig,
   SheetRow,
   GoogleSheetsAdapter,
+  GoogleSheetEventRecord,
+  GoogleSheetsEventsAdapter,
   DriveFileMetadata,
   GoogleDriveAdapter,
   FormResponse,
@@ -26,4 +28,5 @@ export {
 
 export { GoogleAuthClient } from "./auth.js";
 export { GoogleSheetsService } from "./sheets.js";
+export { GoogleSheetsEventsService, type GoogleSheetsEventsConfig } from "./events.js";
 
