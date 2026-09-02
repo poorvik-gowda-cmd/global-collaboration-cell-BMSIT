@@ -19,7 +19,8 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@gcc-portal/contracts": "workspace:*"
+    "@gcc-portal/contracts": "workspace:*",
+    "jose": "^6.2.10"
   },
   "devDependencies": {
     "eslint": "^9.0.0",

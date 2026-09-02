@@ -23,3 +23,7 @@ export {
   GoogleAuthError,
   GoogleApiRateLimitError,
 } from "./errors.js";
+
+export { GoogleAuthClient } from "./auth.js";
+export { GoogleSheetsService } from "./sheets.js";
+
