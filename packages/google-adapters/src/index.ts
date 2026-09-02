@@ -48,4 +48,5 @@ export { GoogleSheetsResearchService, type GoogleSheetsResearchConfig } from "./
 export { GoogleSheetsMouService, type GoogleSheetsMouConfig } from "./mou.js";
 export { GoogleSheetsQrService, type GoogleSheetsQrConfig } from "./qr.js";
 export { GoogleDriveService } from "./drive.js";
+export { GoogleFormsService } from "./forms.js";
 
