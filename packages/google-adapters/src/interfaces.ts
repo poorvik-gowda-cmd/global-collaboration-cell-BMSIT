@@ -1,9 +1,8 @@
 /**
  * Google Workspace adapter interfaces — GCC Portal
  *
- * These interfaces define contracts for future Google API integrations.
- * Concrete implementations are NOT included yet.
- *
+ * These interfaces define contracts for Google API integrations.
+ * Concrete implementations for Google Sheets are included.
  * Planned adapters:
  *   - GoogleSheetsAdapter  — read/write operational data from Google Sheets
  *   - GoogleDriveAdapter   — file management and folder access
@@ -132,4 +131,28 @@ export interface GoogleSheetEventRecord {
 export interface GoogleSheetsEventsAdapter {
   getEvents(): Promise<GoogleSheetEventRecord[]>;
   appendEvent(event: GoogleSheetEventRecord): Promise<void>;
+}
+
+// -----------------------------------------------------------------------
+// Registrations adapter
+// -----------------------------------------------------------------------
+
+export interface GoogleSheetRegistrationRecord {
+  registration_id: string;
+  event_id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  college: string;
+  department: string;
+  year: string;
+  custom_fields: string;
+  registered_at: string;
+  status: string;
+}
+
+export interface GoogleSheetsRegistrationsAdapter {
+  getRegistrations(eventId: string): Promise<GoogleSheetRegistrationRecord[]>;
+  appendRegistration(registration: GoogleSheetRegistrationRecord): Promise<void>;
+  getRegistrationById(eventId: string, registrationId: string): Promise<GoogleSheetRegistrationRecord | null>;
 }
