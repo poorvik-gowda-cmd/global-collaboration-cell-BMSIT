@@ -232,3 +232,27 @@ export interface GoogleSheetsResearchAdapter {
   appendResearchRecord(record: GoogleSheetResearchRecord): Promise<void>;
   getResearchRecordById(researchId: string): Promise<GoogleSheetResearchRecord | null>;
 }
+
+// -----------------------------------------------------------------------
+// MOU Metadata adapter
+// -----------------------------------------------------------------------
+
+export interface GoogleSheetMouRecord {
+  mou_id: string;
+  institution_name: string;
+  country: string;
+  collaboration_area: string;
+  year: string;
+  drive_file_id: string;
+  drive_url: string;
+  access_level: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoogleSheetsMouAdapter {
+  getMouRecords(): Promise<GoogleSheetMouRecord[]>;
+  appendMouRecord(record: GoogleSheetMouRecord): Promise<void>;
+  getMouRecordById(mouId: string): Promise<GoogleSheetMouRecord | null>;
+}

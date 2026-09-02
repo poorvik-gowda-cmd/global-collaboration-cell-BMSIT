@@ -21,6 +21,8 @@ export type {
   GoogleSheetsOpportunitiesAdapter,
   GoogleSheetResearchRecord,
   GoogleSheetsResearchAdapter,
+  GoogleSheetMouRecord,
+  GoogleSheetsMouAdapter,
   DriveFileMetadata,
   GoogleDriveAdapter,
   FormResponse,
@@ -40,4 +42,5 @@ export { GoogleSheetsRegistrationsService, type GoogleSheetsRegistrationsConfig 
 export { GoogleSheetsTasksService, type GoogleSheetsTasksConfig } from "./tasks.js";
 export { GoogleSheetsOpportunitiesService, type GoogleSheetsOpportunitiesConfig } from "./opportunities.js";
 export { GoogleSheetsResearchService, type GoogleSheetsResearchConfig } from "./research.js";
+export { GoogleSheetsMouService, type GoogleSheetsMouConfig } from "./mou.js";
 
