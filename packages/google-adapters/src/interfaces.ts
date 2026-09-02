@@ -208,3 +208,27 @@ export interface GoogleSheetsOpportunitiesAdapter {
   appendOpportunity(opportunity: GoogleSheetOpportunityRecord): Promise<void>;
   getOpportunityById(opportunityId: string): Promise<GoogleSheetOpportunityRecord | null>;
 }
+
+// -----------------------------------------------------------------------
+// Research Metadata adapter
+// -----------------------------------------------------------------------
+
+export interface GoogleSheetResearchRecord {
+  research_id: string;
+  title: string;
+  description: string;
+  category: string;
+  drive_file_id: string;
+  drive_url: string;
+  owner: string;
+  department: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoogleSheetsResearchAdapter {
+  getResearchRecords(): Promise<GoogleSheetResearchRecord[]>;
+  appendResearchRecord(record: GoogleSheetResearchRecord): Promise<void>;
+  getResearchRecordById(researchId: string): Promise<GoogleSheetResearchRecord | null>;
+}

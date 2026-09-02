@@ -19,6 +19,8 @@ export type {
   GoogleSheetsTasksAdapter,
   GoogleSheetOpportunityRecord,
   GoogleSheetsOpportunitiesAdapter,
+  GoogleSheetResearchRecord,
+  GoogleSheetsResearchAdapter,
   DriveFileMetadata,
   GoogleDriveAdapter,
   FormResponse,
@@ -37,4 +39,5 @@ export { GoogleSheetsEventsService, type GoogleSheetsEventsConfig } from "./even
 export { GoogleSheetsRegistrationsService, type GoogleSheetsRegistrationsConfig } from "./registrations.js";
 export { GoogleSheetsTasksService, type GoogleSheetsTasksConfig } from "./tasks.js";
 export { GoogleSheetsOpportunitiesService, type GoogleSheetsOpportunitiesConfig } from "./opportunities.js";
+export { GoogleSheetsResearchService, type GoogleSheetsResearchConfig } from "./research.js";
 
