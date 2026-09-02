@@ -15,6 +15,8 @@ export type {
   GoogleSheetsEventsAdapter,
   GoogleSheetRegistrationRecord,
   GoogleSheetsRegistrationsAdapter,
+  GoogleSheetTaskRecord,
+  GoogleSheetsTasksAdapter,
   DriveFileMetadata,
   GoogleDriveAdapter,
   FormResponse,
@@ -31,4 +33,5 @@ export { GoogleAuthClient } from "./auth.js";
 export { GoogleSheetsService } from "./sheets.js";
 export { GoogleSheetsEventsService, type GoogleSheetsEventsConfig } from "./events.js";
 export { GoogleSheetsRegistrationsService, type GoogleSheetsRegistrationsConfig } from "./registrations.js";
+export { GoogleSheetsTasksService, type GoogleSheetsTasksConfig } from "./tasks.js";
 

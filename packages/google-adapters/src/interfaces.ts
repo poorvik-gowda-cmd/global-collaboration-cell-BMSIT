@@ -156,3 +156,31 @@ export interface GoogleSheetsRegistrationsAdapter {
   appendRegistration(registration: GoogleSheetRegistrationRecord): Promise<void>;
   getRegistrationById(eventId: string, registrationId: string): Promise<GoogleSheetRegistrationRecord | null>;
 }
+
+// -----------------------------------------------------------------------
+// Tasks adapter
+// -----------------------------------------------------------------------
+
+export interface GoogleSheetTaskRecord {
+  task_id: string;
+  title: string;
+  description: string;
+  department: string;
+  assigned_to_user_id: string;
+  assigned_to_name: string;
+  assigned_by: string;
+  deadline: string;
+  priority: string;
+  status: string;
+  progress_update: string;
+  latest_update_at: string;
+  remark: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoogleSheetsTasksAdapter {
+  getTasks(): Promise<GoogleSheetTaskRecord[]>;
+  appendTask(task: GoogleSheetTaskRecord): Promise<void>;
+  getTaskById(taskId: string): Promise<GoogleSheetTaskRecord | null>;
+}
