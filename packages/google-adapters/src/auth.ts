@@ -6,7 +6,10 @@ export class GoogleAuthClient {
   private token: string | null = null;
   private tokenExpiry = 0;
 
-  constructor(private readonly config: GoogleServiceAccountConfig) {
+  constructor(
+    private readonly config: GoogleServiceAccountConfig,
+    private readonly scopes: string[] = ["https://www.googleapis.com/auth/spreadsheets"]
+  ) {
     if (!config.clientEmail || !config.privateKey) {
       throw new GoogleAuthError("Missing required service account configuration (clientEmail or privateKey).");
     }
@@ -29,7 +32,7 @@ export class GoogleAuthClient {
         iss: this.config.clientEmail,
         sub: this.config.clientEmail,
         aud: "https://oauth2.googleapis.com/token",
-        scope: "https://www.googleapis.com/auth/spreadsheets",
+        scope: this.scopes.join(" "),
       })
       .setProtectedHeader({ alg: 'RS256', typ: 'JWT' })
       .setIssuedAt(now)
