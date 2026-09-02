@@ -7,13 +7,14 @@ export interface EventFilter {
   category?: string;
   page?: number;
   pageSize?: number;
+  currentUserId?: string;
 }
 
 export class EventRepository {
   constructor(private readonly db: DatabaseClient) {}
 
   async findAll(filter: EventFilter = {}): Promise<{ data: Event[]; total: number }> {
-    const { status = "published", createdBy, category, page = 1, pageSize = 20 } = filter;
+    const { status = "published", createdBy, category, page = 1, pageSize = 20, currentUserId } = filter;
     
     let whereClause = "WHERE 1=1";
     const params: (string | number | boolean | null)[] = [];
@@ -33,23 +34,48 @@ export class EventRepository {
       params.push(category);
     }
 
-    const countQuery = `SELECT COUNT(*) as total FROM events ${whereClause}`;
+    let selectClause = `SELECT *`;
+    if (currentUserId) {
+      selectClause = `SELECT e.*, EXISTS (SELECT 1 FROM registrations r WHERE r.event_id = e.id AND r.user_id = ?) as is_registered`;
+      // We must insert the currentUserId at the BEGINNING of the params for the select clause,
+      // but wait, SQLite driver expects params in order of `?`. 
+      // The `?` for currentUserId is in the SELECT clause, which comes before the WHERE clause.
+    }
+
+    const countQuery = `SELECT COUNT(*) as total FROM events e ${whereClause}`;
     const countResult = await this.db.queryFirst<{ total: number }>(countQuery, ...params);
     const total = countResult?.total ?? 0;
 
     const offset = (page - 1) * pageSize;
-    const dataQuery = `SELECT * FROM events ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+    const dataQuery = `${selectClause} FROM events e ${whereClause} ORDER BY e.created_at DESC LIMIT ? OFFSET ?`;
     
-    // SQLite uses snake_case, but our Event type expects snake_case for created_by, created_at, updated_at
-    // wait, we defined the Zod schema with snake_case: id, title, description, date, location, category, status, created_by, created_at, updated_at
-    // so we can just use `SELECT *`.
-    const dataParams = [...params, pageSize, offset];
-    const data = await this.db.query<Event>(dataQuery, ...dataParams);
+    let dataParams = [...params, pageSize, offset];
+    if (currentUserId) {
+      dataParams = [currentUserId, ...params, pageSize, offset];
+    }
 
-    return { data, total };
+    let data = await this.db.query<Event & { is_registered?: number | boolean }>(dataQuery, ...dataParams);
+    
+    // SQLite EXISTS returns 1 or 0, we need boolean
+    if (currentUserId) {
+      data = data.map(d => ({ ...d, is_registered: !!d.is_registered }));
+    }
+
+    return { data: data, total };
   }
 
-  async findById(id: string): Promise<Event | null> {
+  async findById(id: string, currentUserId?: string): Promise<Event | null> {
+    if (currentUserId) {
+      const result = await this.db.queryFirst<Event & { is_registered?: number | boolean }>(
+        `SELECT e.*, EXISTS (SELECT 1 FROM registrations r WHERE r.event_id = e.id AND r.user_id = ?) as is_registered 
+         FROM events e WHERE e.id = ?`, 
+        currentUserId, id
+      );
+      if (result) {
+        result.is_registered = !!result.is_registered;
+      }
+      return (result as Event) ?? null;
+    }
     return this.db.queryFirst<Event>("SELECT * FROM events WHERE id = ?", id);
   }
 

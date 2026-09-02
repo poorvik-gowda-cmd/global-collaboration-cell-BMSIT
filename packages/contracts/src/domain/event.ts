@@ -13,6 +13,7 @@ export const EventSchema = z.object({
   created_by: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
+  is_registered: z.boolean().optional(),
 });
 
 export type Event = z.infer<typeof EventSchema>;
@@ -23,6 +24,7 @@ export const CreateEventRequestSchema = EventSchema.omit({
   created_by: true,
   created_at: true,
   updated_at: true,
+  is_registered: true,
 });
 
 export type CreateEventRequest = z.infer<typeof CreateEventRequestSchema>;

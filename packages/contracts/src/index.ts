@@ -22,3 +22,4 @@ export type { HealthResponse } from "./api/health.js";
 // ---- Domain types ----
 export type { UserIdentity, UserRole } from "./domain/user.js";
 export * from "./domain/event.js";
+export * from "./domain/registration.js";

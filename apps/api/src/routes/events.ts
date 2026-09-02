@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { DatabaseClient } from "@gcc-portal/database";
 import { EventRepository } from "../repositories/EventRepository.js";
+import { RegistrationRepository } from "../repositories/RegistrationRepository.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { CreateEventRequestSchema, UpdateEventRequestSchema } from "@gcc-portal/contracts";
 import type { Env } from "../types/bindings.js";
@@ -11,16 +12,19 @@ import { z } from "zod";
 
 const events = new Hono<{ Bindings: Env; Variables: { user: UserIdentity } }>();
 
-function getRepo(c: Context) {
+function getRepo(c: Context<{ Bindings: Env; Variables: { user: UserIdentity } }>) {
   const dbClient = new DatabaseClient({ db: c.env.DB, environment: c.env.ENVIRONMENT });
-  return new EventRepository(dbClient);
+  return {
+    eventRepo: new EventRepository(dbClient),
+    regRepo: new RegistrationRepository(dbClient)
+  };
 }
 
 // Optional Auth Middleware to attach user if token exists, without throwing 401 if missing
-const optionalAuthMiddleware = async (c: Context, next: Next) => {
+const optionalAuthMiddleware = async (c: Context<{ Bindings: Env; Variables: { user: UserIdentity } }>, next: Next) => {
   try {
-    await authMiddleware(c, async () => {});
-  } catch (e) {
+    await authMiddleware(c, async () => { /* no-op */ });
+  } catch {
     // ignore
   }
   await next();
@@ -35,7 +39,7 @@ const QuerySchema = z.object({
 
 events.get("/", optionalAuthMiddleware, zValidator("query", QuerySchema), async (c) => {
   const user = c.get("user") as UserIdentity | undefined;
-  const repo = getRepo(c);
+  const { eventRepo } = getRepo(c);
   const query = c.req.valid("query");
 
   let status: "published" | "draft" | "all" = "published";
@@ -53,18 +57,19 @@ events.get("/", optionalAuthMiddleware, zValidator("query", QuerySchema), async 
     if (user.role === "coordinator") {
       status = query.status;
       createdBy = user.id; // Coordinators can only see their own drafts
-    } else if (user.role === "admin") {
+    } else {
       status = query.status;
       // Admins can see any drafts
     }
   }
 
-  const { data, total } = await repo.findAll({
+  const { data, total } = await eventRepo.findAll({
     status,
     createdBy,
     category: query.category,
     page: query.page,
     pageSize: query.pageSize,
+    currentUserId: user?.id,
   });
 
   const page = query.page ?? 1;
@@ -83,9 +88,10 @@ events.get("/", optionalAuthMiddleware, zValidator("query", QuerySchema), async 
 });
 
 events.get("/:id", optionalAuthMiddleware, async (c) => {
-  const id = c.req.param("id") as string;
-  const repo = getRepo(c);
-  const event = await repo.findById(id);
+  const id = c.req.param("id")!;
+  const user = c.get("user") as UserIdentity | undefined;
+  const { eventRepo } = getRepo(c);
+  const event = await eventRepo.findById(id, user?.id);
 
   if (!event) {
     return c.json({ success: false, error: { code: "NOT_FOUND", message: "Event not found" } }, 404);
@@ -114,7 +120,7 @@ events.post("/", authMiddleware, zValidator("json", CreateEventRequestSchema), a
   }
 
   const data = c.req.valid("json");
-  const repo = getRepo(c);
+  const { eventRepo } = getRepo(c);
 
   const now = new Date().toISOString();
   const event = {
@@ -125,21 +131,21 @@ events.post("/", authMiddleware, zValidator("json", CreateEventRequestSchema), a
     updated_at: now,
   };
 
-  await repo.create(event);
+  await eventRepo.create(event);
 
   return c.json({ success: true, data: event }, 201);
 });
 
 events.put("/:id", authMiddleware, zValidator("json", UpdateEventRequestSchema), async (c) => {
-  const id = c.req.param("id");
+  const id = c.req.param("id") as string;
   const user = c.get("user");
   
   if (user.role === "member") {
     return c.json({ success: false, error: { code: "FORBIDDEN", message: "Members cannot edit events" } }, 403);
   }
 
-  const repo = getRepo(c);
-  const event = await repo.findById(id);
+  const { eventRepo } = getRepo(c);
+  const event = await eventRepo.findById(id);
 
   if (!event) {
     return c.json({ success: false, error: { code: "NOT_FOUND", message: "Event not found" } }, 404);
@@ -157,31 +163,86 @@ events.put("/:id", authMiddleware, zValidator("json", UpdateEventRequestSchema),
     updated_at: now,
   };
 
-  await repo.update(id, updates);
+  await eventRepo.update(id, updates);
   
-  const updatedEvent = await repo.findById(id);
+  const updatedEvent = await eventRepo.findById(id);
 
   return c.json({ success: true, data: updatedEvent });
 });
 
 events.delete("/:id", authMiddleware, async (c) => {
-  const id = c.req.param("id")!;
+  const id = c.req.param("id") as string;
   const user = c.get("user");
 
   if (user.role !== "admin") {
     return c.json({ success: false, error: { code: "FORBIDDEN", message: "Only admins can delete events" } }, 403);
   }
 
-  const repo = getRepo(c);
-  const event = await repo.findById(id);
+  const { eventRepo } = getRepo(c);
+  const event = await eventRepo.findById(id);
 
   if (!event) {
     return c.json({ success: false, error: { code: "NOT_FOUND", message: "Event not found" } }, 404);
   }
 
-  await repo.delete(id);
+  await eventRepo.delete(id);
 
   return c.json({ success: true, data: { deleted: true } });
+});
+
+events.post("/:id/registrations", authMiddleware, async (c) => {
+  const id = c.req.param("id") as string;
+  const user = c.get("user") as UserIdentity;
+  const { eventRepo, regRepo } = getRepo(c);
+
+  const event = await eventRepo.findById(id);
+  if (!event) {
+    return c.json({ success: false, error: { code: "NOT_FOUND", message: "Event not found" } }, 404);
+  }
+
+  // Guests are blocked by authMiddleware.
+  
+  const registered = await regRepo.create({
+    id: crypto.randomUUID(),
+    event_id: id,
+    user_id: user.id,
+    registered_at: new Date().toISOString()
+  });
+
+  if (!registered) {
+    return c.json({ success: false, error: { code: "CONFLICT", message: "Already registered" } }, 409);
+  }
+
+  return c.json({ success: true, data: { registered: true } }, 201);
+});
+
+events.delete("/:id/registrations", authMiddleware, async (c) => {
+  const id = c.req.param("id") as string;
+  const user = c.get("user") as UserIdentity;
+  const { regRepo } = getRepo(c);
+
+  await regRepo.delete(id, user.id);
+
+  return c.json({ success: true, data: { unregistered: true } });
+});
+
+events.get("/:id/registrations", authMiddleware, async (c) => {
+  const id = c.req.param("id") as string;
+  const user = c.get("user") as UserIdentity;
+  const { eventRepo, regRepo } = getRepo(c);
+
+  const event = await eventRepo.findById(id);
+  if (!event) {
+    return c.json({ success: false, error: { code: "NOT_FOUND", message: "Event not found" } }, 404);
+  }
+
+  if (user.role !== "admin" && (user.role !== "coordinator" || event.created_by !== user.id)) {
+    return c.json({ success: false, error: { code: "FORBIDDEN", message: "Not authorized to view attendees" } }, 403);
+  }
+
+  const attendees = await regRepo.findAttendeesByEventId(id);
+
+  return c.json({ success: true, data: attendees });
 });
 
 export { events };

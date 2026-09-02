@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import app from "../src/index.js";
-// @ts-ignore - cloudflare:test is resolved by vitest
-import { env, applyD1Migrations } from "cloudflare:test";
+// @ts-expect-error - cloudflare:test is resolved by vitest
+import { env } from "cloudflare:test";
 import { sign } from "hono/jwt";
 import type { D1Database } from "@cloudflare/workers-types";
 import type { UserIdentity } from "@gcc-portal/contracts";
@@ -37,6 +37,7 @@ describe("Events API", () => {
   beforeAll(async () => {
     await (env.DB as D1Database).exec(`CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE, display_name TEXT, avatar_url TEXT, role TEXT, created_at TEXT, updated_at TEXT);`);
     await (env.DB as D1Database).exec(`CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY, title TEXT NOT NULL, description TEXT, date TEXT NOT NULL, location TEXT, category TEXT NOT NULL, status TEXT NOT NULL CHECK (status IN ('draft', 'published')), created_by TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, FOREIGN KEY (created_by) REFERENCES users(id));`);
+    await (env.DB as D1Database).exec(`CREATE TABLE IF NOT EXISTS registrations (id TEXT PRIMARY KEY, event_id TEXT NOT NULL, user_id TEXT NOT NULL, registered_at TEXT NOT NULL, FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, UNIQUE (event_id, user_id));`);
     await (env.DB as D1Database).exec(`INSERT INTO users (id, email, display_name, role, created_at, updated_at) VALUES ('admin-123', 'admin@example.com', 'Admin User', 'admin', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z'), ('coord-123', 'coord@example.com', 'Coord User', 'coordinator', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z'), ('member-123', 'member@example.com', 'Member User', 'member', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z');`);
     await (env.DB as D1Database).exec(`INSERT INTO events (id, title, description, date, location, category, status, created_by, created_at, updated_at) VALUES ('test-event-123', 'Test Event', 'A test event', '2026-10-10T10:00:00Z', 'BMSIT', 'Tech', 'draft', 'coord-123', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z');`);
   });
@@ -75,9 +76,9 @@ describe("Events API", () => {
     }, coordinatorUser);
     
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = (await res.json()) as Record<string, any>;
     expect(body.success).toBe(true);
-    expect(body.data.id).toBeDefined();
+    expect(body.data?.id).toBeDefined();
   });
 
   it("should forbid member from creating an event", async () => {
@@ -106,7 +107,7 @@ describe("Events API", () => {
       status: "published"
     }, adminUser);
     expect(res.status).toBe(200);
-    const body = await res.json() as { success: boolean; data: { id: string; status: string } };
+    const body = (await res.json()) as { success: boolean; data: { id: string; status: string } };
     expect(body.data.status).toBe("published");
   });
 
@@ -116,8 +117,8 @@ describe("Events API", () => {
     
     const res = await fetchApi("/events");
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.data.length).toBe(1);
+    const body = (await res.json()) as Record<string, any>;
+    expect(body.data?.length).toBe(1);
     expect(body.data?.[0]?.status).toBe("published");
   });
 
@@ -126,8 +127,8 @@ describe("Events API", () => {
     
     const res = await fetchApi("/events?category=Tech&page=1&pageSize=10");
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.meta.total).toBe(1);
+    const body = (await res.json()) as Record<string, any>;
+    expect(body.meta?.total).toBe(1);
   });
 
   it("should allow admin to delete the event", async () => {

@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type { Event } from "@gcc-portal/contracts";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Events() {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const { user } = useAuth();
+  const [registeringId, setRegisteringId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -37,6 +40,35 @@ export default function Events() {
       month: "long",
       year: "numeric"
     });
+  };
+
+  const handleRegistration = async (eventId: string, isRegistered: boolean) => {
+    if (!user) {
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787"}/auth/login`;
+      return;
+    }
+
+    try {
+      setRegisteringId(eventId);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8787";
+      const method = isRegistered ? "DELETE" : "POST";
+      const res = await fetch(`${apiUrl}/events/${eventId}/registrations`, {
+        method,
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        setEvents((prev) =>
+          prev.map((e) =>
+            e.id === eventId ? { ...e, is_registered: !isRegistered } : e
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update registration", error);
+    } finally {
+      setRegisteringId(null);
+    }
   };
 
   return (
@@ -140,9 +172,26 @@ export default function Events() {
                 </motion.p>
               </div>
 
-              {/* Arrow */}
+              {/* Action */}
               <div className="mt-10 flex items-center justify-between border-t border-white/10 pt-5">
-                <span className="text-sm text-white/50">View event</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void handleRegistration(event.id, !!event.is_registered);
+                  }}
+                  disabled={registeringId === event.id}
+                  className={`text-sm transition-colors ${
+                    event.is_registered 
+                      ? "text-[#68d32f] hover:text-red-500" 
+                      : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  {registeringId === event.id
+                    ? "Updating..."
+                    : event.is_registered
+                    ? "Registered (Click to cancel)"
+                    : "Register for event"}
+                </button>
 
                 <motion.span 
                   variants={{
