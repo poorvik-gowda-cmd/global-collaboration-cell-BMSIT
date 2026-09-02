@@ -256,3 +256,25 @@ export interface GoogleSheetsMouAdapter {
   appendMouRecord(record: GoogleSheetMouRecord): Promise<void>;
   getMouRecordById(mouId: string): Promise<GoogleSheetMouRecord | null>;
 }
+
+// -----------------------------------------------------------------------
+// QR Registry adapter
+// -----------------------------------------------------------------------
+
+export type QrType = "REGISTRATION" | "ATTENDANCE" | "FEEDBACK";
+
+export interface GoogleSheetQrRecord {
+  qr_id: string;
+  event_id: string;
+  qr_type: QrType | string;
+  target_url: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoogleSheetsQrAdapter {
+  getQrRecords(): Promise<GoogleSheetQrRecord[]>;
+  appendQrRecord(record: GoogleSheetQrRecord): Promise<void>;
+  getQrRecordById(qrId: string): Promise<GoogleSheetQrRecord | null>;
+}

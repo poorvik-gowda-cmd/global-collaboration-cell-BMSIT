@@ -23,6 +23,9 @@ export type {
   GoogleSheetsResearchAdapter,
   GoogleSheetMouRecord,
   GoogleSheetsMouAdapter,
+  GoogleSheetQrRecord,
+  GoogleSheetsQrAdapter,
+  QrType,
   DriveFileMetadata,
   GoogleDriveAdapter,
   FormResponse,
@@ -43,4 +46,5 @@ export { GoogleSheetsTasksService, type GoogleSheetsTasksConfig } from "./tasks.
 export { GoogleSheetsOpportunitiesService, type GoogleSheetsOpportunitiesConfig } from "./opportunities.js";
 export { GoogleSheetsResearchService, type GoogleSheetsResearchConfig } from "./research.js";
 export { GoogleSheetsMouService, type GoogleSheetsMouConfig } from "./mou.js";
+export { GoogleSheetsQrService, type GoogleSheetsQrConfig } from "./qr.js";
 
